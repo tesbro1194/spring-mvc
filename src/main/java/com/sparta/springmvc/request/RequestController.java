@@ -3,8 +3,6 @@ package com.sparta.springmvc.request;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Path;
-
 @Controller
 @RequestMapping("/hello/request")
 public class RequestController {
@@ -28,7 +26,7 @@ public class RequestController {
     // [Request sample] GET http://localhost:8080/hello/request/form/param?name=Robbie&age=95   param 이후 ? , 추가, 데이터 구분은 &
     @GetMapping("/form/param")
     @ResponseBody
-    public String helloGetRequestParam(@RequestParam String name, int age) {  // @RequestParam 생략 가능
+    public String helloGetRequestParam(@RequestParam String name, int age) {  // @RequestParam 생략 가능, simple value 타입일 때
         return String.format("Hello, @RequestParam.<br> name = %s, age = %d", name, age);
     }
 
@@ -42,5 +40,38 @@ public class RequestController {
     @ResponseBody
     public String helloPostRequestParam(@RequestParam String name, @RequestParam int age) {
         return String.format("Hello, @RequestParam.<br> name = %s, age = %d", name, age);
+    }
+
+    // HTTP 데이터를 객체로 처리하는 방법 : Setter 메서드, 혹은 입력을 받을 수 있는 생성자 메서드가 필요함.
+
+/*   1. [Request sample] : POST http://localhost:8080/hello/request/form/model
+     Header
+      Content type: application/x-www-form-urlencoded
+     Body
+      name=Robbie&age=95*/    // Body 에 query String 으로 넘어온 것을 객체로 !
+    @PostMapping("/form/model")
+    @ResponseBody
+    public String helloRequestBodyForm(@ModelAttribute Star star) {
+        return String.format("Hello, @ModelAttribute.<br> (name = %s, age = %d) ", star.name, star.age);
+    }
+
+    //  2. [Request sample] : GET http://localhost:8080/hello/request/form/param/model?name=Robbie&age=95
+    // `?name=Robbie&age=95` 이런 방식으로 넘어온 데이터를 객체로 !
+
+    @GetMapping("/form/param/model")
+    @ResponseBody
+    public String helloRequestParam(@ModelAttribute Star star) {  // @ModelAttribute 생략 가능 , 객체일 때
+        return String.format("Hello, @ModelAttribute.<br> (name = %s, age = %d) ", star.name, star.age);
+    }
+
+/*   [Request sample] : POST http://localhost:8080/hello/request/form/json
+     Header
+      Content type: application/json
+     Body
+      {"name":"Robbie","age":"95"} */     //  body 에 Json 형식으로 넘어옴.
+    @PostMapping("/form/json")
+    @ResponseBody
+    public String helloPostRequestJson(@RequestBody Star star) {
+        return String.format("Hello, @RequestBody.<br> (name = %s, age = %d) ", star.name, star.age);
     }
 }
